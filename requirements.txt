@@ -1,9 +1,13 @@
-streamlit
-openai
+google-generativeai
 pymongo
 python-dotenv
-sentence-transformers
+streamlit
+sentence-transformers==2.2.2
 pandas
 PyPDF2
 scikit-learn
 numpy
+torch==2.0.1
+huggingface_hub==0.16.4
+transformers==4.34.0
+toml
