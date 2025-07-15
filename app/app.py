@@ -7,13 +7,13 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import pymongo
-from dotenv import load_dotenv
+import toml
 import os
 
 # Environment variables
-load_dotenv()
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-mongo_uri = os.getenv("MONGO_URI")
+config = toml.load("config.toml")
+gemini_api_key = config["GEMINI_API_KEY"]
+mongo_uri = config["MONGO_URI"]
 
 # Clients
 try:
