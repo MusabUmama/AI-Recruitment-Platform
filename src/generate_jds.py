@@ -72,7 +72,8 @@ Ensure the job description is detailed, professional, and realistic for the role
 def generate_jd(role: str, domain: str) -> Dict:
     """Generate a single job description using the OpenAI API"""
     try:
-        response = openai.ChatCompletion.create(
+        client = openai.OpenAI(api_key=openai.api_key)
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a professional HR expert generating realistic job descriptions."},
@@ -137,7 +138,7 @@ def save_jds(jds: List[Dict], filename: str = "job_descriptions.json"):
         print(f"Error saving JDs: {e}")
 
 def main():
-    """Main function to generate and save job descriptions."""
+    """Main function to generate and save job descriptions"""
     jds = generate_all_jds()
     save_jds(jds)
     
