@@ -2,6 +2,8 @@
 
 An AI-powered job matching platform that uses Large Language Models (LLMs) and Retrieval-Augmented Generation (RAG) to match resumes with job descriptions. The platform extracts structured data from PDF resumes, processes job descriptions, and recommends the top 5 matching jobs based on skills and experience..
 
+![UI](https://github.com/MusabUmama/AI-Recruitment-Platform/blob/main/UI.png)
+
 ## Features
 
 - **Resume Processing**: Upload a PDF resume to extract name, skills, experience, and education using the Google Gemini API.
