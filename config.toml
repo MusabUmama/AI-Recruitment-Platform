@@ -1,3 +1,2 @@
-OPENAI_API_KEY = "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"
 MONGO_URI = "mongodb+srv://musabumama84:VFate97lnTJ15ZHB@cluster1.m5ytfvq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1"
 GEMINI_API_KEY = "AIzaSyDdc_HbmnSOHEIci1SW0ejxPco2tYeqe38"

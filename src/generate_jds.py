@@ -1,13 +1,12 @@
-import openai
 import json
 import random
+import google.generativeai as genai
 from typing import List, Dict
-import os
-from dotenv import load_dotenv
+import toml
 
 # Environment variables
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+config = toml.load("config.toml")
+gemini_api_key = config["GEMINI_API_KEY"]
 
 # Roles for each domain
 ROLES = {
@@ -61,7 +60,7 @@ Generate a realistic job description for a {role} in the {domain} domain. Includ
 - Company Name
 - Location
 - Responsibilities (4-6 bullet points)
-- Required Skills (4-6 technical and soft skills)
+- Required Skills (Tech Stack, 5-6 tools/frameworks)
 - Experience (in years)
 - Education (degree and field)
 Return the output in JSON format with the fields: title, company, location, responsibilities, skills, experience, education.
@@ -70,19 +69,15 @@ Ensure the job description is detailed, professional, and realistic for the role
 
 # Function to generate JD for a role
 def generate_jd(role: str, domain: str) -> Dict:
-    """Generate a single job description using the OpenAI API"""
+    """Generate a single job description using the Gemini API"""
     try:
-        client = openai.OpenAI(api_key=openai.api_key)
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a professional HR expert generating realistic job descriptions."},
-                {"role": "user", "content": PROMPT.format(role=role, domain=domain)}
-            ],
-            temperature=0.7,
-            max_tokens=500
+        genai.configure(api_key=gemini_api_key)
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(
+            PROMPT.format(role=role, domain=domain),
+            generation_config={"response_mime_type": "application/json"}
         )
-        jd_text = response.choices[0].message.content
+        jd_text = response.text
         # Parse JSON response
         jd = json.loads(jd_text)
         # Add company and location
@@ -125,7 +120,7 @@ def generate_all_jds() -> List[Dict]:
         if jd:
             jds.append(jd)
     
-    return jds[:200]  # Trim to 200 if exceeded
+    return jds[:200]  # Trimming to 200 if exceeded
 
 # Function to load the JDs to a JSON File
 def save_jds(jds: List[Dict], filename: str = "job_descriptions.json"):

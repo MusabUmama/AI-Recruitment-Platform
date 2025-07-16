@@ -1,16 +1,17 @@
 import json
 import pymongo
-from openai import OpenAI
-from dotenv import load_dotenv
+import toml
+import google.generativeai as genai
 import os
 
 # Environment variables
-load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
+config = toml.load("config.toml")
+gemini_api_key = config["GEMINI_API_KEY"]
 mongo_uri = os.getenv("MONGO_URI")
 
 # Clients
-client = OpenAI(api_key=openai_api_key)
+genai.configure(api_key=gemini_api_key)
+model = genai.GenerativeModel("gemini-2.5-flash")
 mongo_client = pymongo.MongoClient(mongo_uri)
 db = mongo_client["recruitment_platform"]
 collection = db["job_descriptions"]
@@ -20,7 +21,7 @@ PROMPT = """
 Extract the following from the job description in JSON format:
 - title: Job title
 - responsibilities: List of responsibilities
-- skills: List of required skills
+- skills: List of required skills (Tech Stack)
 - experience: Years of experience (e.g., '3-5 years')
 - location: Job location
 - company: Company name
@@ -31,19 +32,14 @@ Return only the JSON output.
 
 # Function to process JD
 def process_jd(jd: dict) -> dict:
-    """Process a single JD using the LLM"""
+    """Process a single JD using the Gemini API"""
     try:
         jd_text = json.dumps(jd)
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are an expert at extracting structured data."},
-                {"role": "user", "content": PROMPT.format(jd=jd_text)}
-            ],
-            temperature=0.5,
-            max_tokens=300
+        response = model.generate_content(
+            PROMPT.format(jd=jd_text),
+            generation_config={"response_mime_type": "application/json"}
         )
-        return json.loads(response.choices[0].message.content)
+        return json.loads(response.text)
     except Exception as e:
         print(f"Error processing JD {jd.get('title', 'unknown')}: {e}")
         return jd  # Return original JD as fallback
