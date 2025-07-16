@@ -27,9 +27,7 @@ Install required packages:pip install -r requirements.txt
 
 3. **Set Up Environment Variables**:
 
-Copy .env.example to .env:cp .env.example .env
-
-Edit .env with your credentials:GEMINI_API_KEY=your-gemini-api-key
+GEMINI_API_KEY=your-gemini-api-key
 MONGO_URI=mongodb+srv://<username>:<password>@cluster0.<random>.mongodb.net/recruitment_platform?retryWrites=true&w=majority
 
 Obtain GEMINI_API_KEY from Google AI Studio.
@@ -67,6 +65,8 @@ Add environment variables (GEMINI_API_KEY, MONGO_URI) in Streamlit Cloud setting
 Deploy and access the app at the provided URL.
 
 Deployed URL:
+
+https://ai-recruitment-platform-az8moar9nxnahrteju6dqv.streamlit.app/
 
 
 
