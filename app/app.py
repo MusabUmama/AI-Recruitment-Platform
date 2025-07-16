@@ -8,7 +8,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 import pymongo
 import toml
-import os
 
 # Environment variables
 config = toml.load("config.toml")
@@ -31,23 +30,29 @@ except Exception as e:
 st.markdown(
     """
     <style>
-    /* background */
+    /* Background */
     .stApp {
         background: linear-gradient(to bottom right, #E6F0FA, #FFFFFF);
     }
-    /* blocks */
+    /* Blocks */
     .block-container {
         background-color: white;
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
+        max-width: 90%; /* Increased width for content columns */
+        width: 90%; /* Ensure responsive width */
     }
-    /* text */
+    /* Text */
     h1, h2, h3, .stMarkdown, .stText {
         color: #003087 !important;
     }
-    /* buttons */
+    /* Success Messages */
+    .stSuccess {
+        color: #000000 !important; /* Black color for success messages */
+    }
+    /* Buttons */
     .stButton>button {
         background-color: #E6F0FA;
         color: #003087;
@@ -59,7 +64,7 @@ st.markdown(
     .stButton>button:hover {
         background-color: #D1E0F5;
     }
-    /* table */
+    /* Table */
     .stTable table {
         width: 100%;
         border-collapse: collapse;
@@ -109,16 +114,41 @@ def extract_resume_data(pdf_file, model_name: str = "gemini-2.5-flash"):
 def get_jd_embeddings():
     """Generate embeddings for all JDs in MongoDB"""
     try:
+        from sentence_transformers import SentenceTransformer
+        embedder = SentenceTransformer("all-MiniLM-L6-v2")
         jds = list(collection.find())
         if not jds:
             st.error("No job descriptions found in MongoDB. Please run process_jds.py first.")
             return [], []
-        jd_texts = [" ".join(jd["skills"] + jd["responsibilities"]) for jd in jds]
-        return jds, embedder.encode(jd_texts)
+        # Handler for missing or invalid skills/responsibilities
+        jd_texts = []
+        valid_jds = []
+        for jd in jds:
+            skills = jd.get("skills", [])
+            if isinstance(skills, dict):
+                skills = [item for sublist in skills.values() for item in (sublist if isinstance(sublist, list) else [sublist])]
+            elif not isinstance(skills, list):
+                skills = []
+            
+            responsibilities = jd.get("responsibilities", [])
+            if isinstance(responsibilities, dict):
+                responsibilities = [item for sublist in responsibilities.values() for item in (sublist if isinstance(sublist, list) else [sublist])]
+            elif not isinstance(responsibilities, list):
+                responsibilities = []
+            
+            if skills or responsibilities:
+                jd_texts.append(" ".join(skills + responsibilities))
+                valid_jds.append(jd)
+                
+        if not jd_texts:
+            st.error("No valid job descriptions with skills or responsibilities found.")
+            return [], []
+        embeddings = embedder.encode(jd_texts)
+        return valid_jds, embeddings
     except Exception as e:
         st.error(f"Error fetching JDs from MongoDB: {e}")
         return [], []
-
+    
 # Function to recommend JDs based on CV
 def recommend_jobs(resume_data):
     """Recommend top 5 JDs based on resume skills and experience"""

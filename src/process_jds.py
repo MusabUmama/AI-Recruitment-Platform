@@ -7,7 +7,7 @@ import os
 # Environment variables
 config = toml.load("config.toml")
 gemini_api_key = config["GEMINI_API_KEY"]
-mongo_uri = os.getenv("MONGO_URI")
+mongo_uri = config["MONGO_URI"]
 
 # Clients
 genai.configure(api_key=gemini_api_key)
@@ -21,7 +21,7 @@ PROMPT = """
 Extract the following from the job description in JSON format:
 - title: Job title
 - responsibilities: List of responsibilities
-- skills: List of required skills (Tech Stack)
+- skills: List of required skills (just extract the name of the tools/frameworks. no sentences)
 - experience: Years of experience (e.g., '3-5 years')
 - location: Job location
 - company: Company name
