@@ -41,8 +41,8 @@ st.markdown(
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
-        max-width: 90%; /* Increased width for content columns */
-        width: 90%; /* Ensure responsive width */
+        max-width: 90%; 
+        width: 90%;
     }
     /* Text */
     h1, h2, h3, .stMarkdown, .stText {
@@ -50,7 +50,7 @@ st.markdown(
     }
     /* Success Messages */
     .stSuccess {
-        color: #000000 !important; /* Black color for success messages */
+        color: #000000 !important;
     }
     /* Buttons */
     .stButton>button {
@@ -74,6 +74,7 @@ st.markdown(
         padding: 10px;
         border: 1px solid #E6F0FA;
         text-align: left;
+        color: #003087;
     }
     .stTable th {
         background-color: #E6F0FA;
